@@ -193,8 +193,8 @@ class SRT:
                 validnum = self.driver.find_element(By.ID, 'athnVal1')
                 validnum.clear()
                 validnum.send_keys(Reginumber)
-                self.driver.implicitly_wait(3
-                )
+                self.driver.implicitly_wait(3)
+
                 # 정보 제공 동의 체크
                 agreementbox = self.driver.find_element(By.ID, "agreeTmp")
                 if agreementbox.is_selected() == False :
@@ -204,14 +204,15 @@ class SRT:
                 self.driver.find_element(By.ID, "requestIssue1").click()
                 self.driver.implicitly_wait(5)
                 try :
-                    WebDriverWait(self.driver, 3).until(EC.alert_is_present())
+                    WebDriverWait(self.driver, 5).until(EC.alert_is_present())
                     confirmation = self.driver.switch_to.alert
                     confirmation.accept()
+                    print("자동 결제 완료. 매크로를 종료합니다.")
                     #confirmation.dismiss()
+
                 except :
-                    print("no alert, 결제 오류 발생")
+                    print("결제 오류 발생, 직접 예약 내역에서 결제 바랍니다.")
                 
-                print("완료")
                 self.driver.implicitly_wait(5)
                 return self.driver
             else:
