@@ -9,11 +9,24 @@ from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.select import Select
 from selenium.common.exceptions import ElementClickInterceptedException, StaleElementReferenceException, WebDriverException
-
+from selenium.webdriver.support.ui import WebDriverWait
+from selenium.webdriver.support import expected_conditions as EC
 from srt_reservation.exceptions import InvalidStationNameError, InvalidDateError, InvalidDateFormatError, InvalidTimeFormatError
 from srt_reservation.validation import station_list
 
 chromedriver_path = r'D:\Work\Myproj\chromedriver-win64\chromedriver.exe'
+# 카드 번호
+CardNo1 = "1234"
+CardNo2 = "5678"
+CardNo3 = "8765"
+CardNo4 = "4321"
+# 카드 유효기간 (Month는 0포함 2자리로 입력, 01~09)
+ValidMonth = "01"
+ValidYear = "2028"
+# 패스워드 앞 2자리
+Password2num = "12"
+# 주민등록번호 앞 6자리
+Reginumber = "860101"
 
 class SRT:
     def __init__(self, dpt_stn, arr_stn, dpt_dt, dpt_tm, num_trains_to_check=2, want_reserve=False):
@@ -134,7 +147,72 @@ class SRT:
             # 예약이 성공하면
             if self.driver.find_elements(By.ID, 'isFalseGotoMain'):
                 self.is_booked = True
-                print("예약 성공")
+                print("예약 성공, 자동 결제로 넘어갑니다")
+                self.driver.find_element(By.XPATH, "/html/body/div/div[4]/div/div[2]/form/fieldset/div[11]/a[1]/span").click()
+                self.driver.implicitly_wait(5)
+
+                # 카드 종류 선택
+                self.driver.find_element(By.ID, "athnDvCd1J").click()
+                
+                # 보안 키패드 해제
+                chkbox = self.driver.find_element(By.ID, "Tk_stlCrCrdNo14_checkbox")
+                if chkbox.is_selected() :
+                    chkbox.click()
+                
+                # 카드 번호 입력
+                cardno1 = self.driver.find_element(By.ID, 'stlCrCrdNo11')
+                cardno1.clear()
+                cardno1.send_keys(CardNo1)
+                cardno2 = self.driver.find_element(By.ID, 'stlCrCrdNo12')
+                cardno2.clear()
+                cardno2.send_keys(CardNo2)
+                cardno3 = self.driver.find_element(By.ID, 'stlCrCrdNo13')
+                cardno3.clear()
+                cardno3.send_keys(CardNo3)
+                cardno4 = self.driver.find_element(By.ID, 'stlCrCrdNo14')
+                cardno4.clear()
+                cardno4.send_keys(CardNo4)
+                self.driver.implicitly_wait(3)
+                # 카드 유효기간 입력
+                cardvalidmonth = self.driver.find_element(By.ID, "crdVlidTrm1M")
+                self.driver.execute_script("arguments[0].setAttribute('style','display: True;')", cardvalidmonth)
+                Select(self.driver.find_element(By.ID, "crdVlidTrm1M")).select_by_visible_text(ValidMonth)
+                cardvalidyear = self.driver.find_element(By.ID, "crdVlidTrm1Y")
+                self.driver.execute_script("arguments[0].setAttribute('style','display: True;')", cardvalidyear)
+                Select(self.driver.find_element(By.ID, "crdVlidTrm1Y")).select_by_visible_text(ValidYear)
+                self.driver.implicitly_wait(3)
+                
+                # 카드 비밀번호 입력
+                pwchkbox = self.driver.find_element(By.ID, "Tk_vanPwd1_checkbox")
+                if pwchkbox.is_selected() :
+                    pwchkbox.click()
+                
+                validpw = self.driver.find_element(By.ID, 'vanPwd1')
+                validpw.clear()
+                validpw.send_keys(Password2num)
+                validnum = self.driver.find_element(By.ID, 'athnVal1')
+                validnum.clear()
+                validnum.send_keys(Reginumber)
+                self.driver.implicitly_wait(3
+                )
+                # 정보 제공 동의 체크
+                agreementbox = self.driver.find_element(By.ID, "agreeTmp")
+                if agreementbox.is_selected() == False :
+                    agreementbox.click()
+                self.driver.implicitly_wait(2)
+                # 결제
+                self.driver.find_element(By.ID, "requestIssue1").click()
+                self.driver.implicitly_wait(5)
+                try :
+                    WebDriverWait(self.driver, 3).until(EC.alert_is_present())
+                    confirmation = self.driver.switch_to.alert
+                    confirmation.accept()
+                    #confirmation.dismiss()
+                except :
+                    print("no alert, 결제 오류 발생")
+                
+                print("완료")
+                self.driver.implicitly_wait(5)
                 return self.driver
             else:
                 print("잔여석 없음. 다시 검색")
