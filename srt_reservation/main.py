@@ -14,19 +14,19 @@ from selenium.webdriver.support import expected_conditions as EC
 from srt_reservation.exceptions import InvalidStationNameError, InvalidDateError, InvalidDateFormatError, InvalidTimeFormatError
 from srt_reservation.validation import station_list
 
-chromedriver_path = r'D:\Work\Myproj\chromedriver-win64\chromedriver.exe'
+chromedriver_path = r'D:\Work\개발업무\Myproj\chromedriver-win64\chromedriver.exe'
 # 카드 번호
-CardNo1 = "1234"
-CardNo2 = "5678"
-CardNo3 = "8765"
-CardNo4 = "4321"
+CardNo1 = "5387"
+CardNo2 = "2082"
+CardNo3 = "6471"
+CardNo4 = "6763"
 # 카드 유효기간 (Month는 0포함 2자리로 입력, 01~09)
-ValidMonth = "01"
+ValidMonth = "11"
 ValidYear = "2028"
 # 패스워드 앞 2자리
-Password2num = "12"
+Password2num = "73"
 # 주민등록번호 앞 6자리
-Reginumber = "860101"
+Reginumber = "860609"
 
 class SRT:
     def __init__(self, dpt_stn, arr_stn, dpt_dt, dpt_tm, num_trains_to_check=2, want_reserve=False):
@@ -123,7 +123,7 @@ class SRT:
         print(f"예약 대기 사용: {self.want_reserve}")
 
         self.driver.find_element(By.XPATH, "//input[@value='조회하기']").click()
-        self.driver.implicitly_wait(5)
+        self.driver.implicitly_wait(30)
         time.sleep(1)
 
     def book_ticket(self, standard_seat, i):
@@ -196,10 +196,10 @@ class SRT:
                 self.driver.implicitly_wait(3)
 
                 # 정보 제공 동의 체크
-                agreementbox = self.driver.find_element(By.ID, "agreeTmp")
-                if agreementbox.is_selected() == False :
-                    agreementbox.click()
-                self.driver.implicitly_wait(2)
+                #agreementbox = self.driver.find_element(By.ID, "agreeTmp")
+                #if agreementbox.is_selected() == False :
+                #    agreementbox.click()
+                #self.driver.implicitly_wait(2)
                 # 결제
                 self.driver.find_element(By.ID, "requestIssue1").click()
                 self.driver.implicitly_wait(5)
@@ -238,7 +238,8 @@ class SRT:
 
     def check_result(self):
         while True:
-            for i in range(1, self.num_trains_to_check+1):
+            #for i in range(1, self.num_trains_to_check+1):
+            for i in range(5, 6):
                 try:
                     standard_seat = self.driver.find_element(By.CSS_SELECTOR, f"#result-form > fieldset > div.tbl_wrap.th_thead > table > tbody > tr:nth-child({i}) > td:nth-child(7)").text
                     reservation = self.driver.find_element(By.CSS_SELECTOR, f"#result-form > fieldset > div.tbl_wrap.th_thead > table > tbody > tr:nth-child({i}) > td:nth-child(8)").text

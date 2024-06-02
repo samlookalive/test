@@ -4,7 +4,8 @@
 from srt_reservation.main import SRT
 from srt_reservation.util import parse_cli_args
 
-'python quickstart.py --user 1234567890 --psw 0000000 --dpt 동탄 --arr 동대구 --dt 20231010 --tm 12 --num 1 --reserve True'
+#python quickstart.py --user 2280918680 --psw ghkrhr2ehd! --dpt 동탄 --arr 천안아산 --dt 20240603 --tm 8 --num 1 --reserve True
+#python quickstart.py --user 2280918680 --psw ghkrhr2ehd! --dpt 동대구 --arr 동탄 --dt 20240607 --tm 16 --num 1 --reserve True
 
 if __name__ == "__main__":
     cli_args = parse_cli_args()
